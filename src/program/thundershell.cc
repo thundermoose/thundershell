@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstdio>
+#include "../shell_reader/shell_reader.hh"
 
 using namespace std;
 
@@ -10,7 +11,7 @@ void usage(char* prg){
 int main(int argc, char** argv){
 #ifdef DEBUG
   printf("This is a unit test\n");
-  // call unit tests from here
+  unit_tests_shell_reader();
 #endif
   usage(*argv);
   return 0;

@@ -3,7 +3,7 @@ CC=g++ --std=c++14
 LFLAGS=
 CFLAGS=
 
-SOURCES= src/program/thundershell.cc
+SOURCES= src/program/thundershell.cc src/shell_reader/shell_reader.cc
 OBJECTS=$(SOURCES:.cc=.o)
 EXECUTABLE=thundershell
 
