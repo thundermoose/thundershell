@@ -24,6 +24,8 @@ public:
   Many_Particle_Basis(Single_Particle_Basis* sp_basis,int A);
   ~Many_Particle_Basis();
   void list_states();
+  size_t get_dimension();
+  slatdet get_state(size_t i);
 };
 
 void unit_test_slater_determinants();

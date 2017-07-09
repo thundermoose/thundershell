@@ -19,7 +19,7 @@ void Many_Particle_Basis::create_particles(slatdet s,int p,int F){
       fprintf(stderr,"This should never happen, we are creating more many particle states than possible\n");
       exit(1);
     }
-    DEBUG_MSG("Created state:%0.64lX\n",s);
+    DEBUG_MSG("Created state:%0.64lx\n",s);
     this->states[this->current_state++]=s;
     return;
   }
@@ -86,9 +86,17 @@ void Many_Particle_Basis::list_states(){
   }
 }
 
+size_t Many_Particle_Basis::get_dimension(){
+  return this->dimension;
+}
+
+slatdet Many_Particle_Basis::get_state(size_t i){
+  return states[i];
+}
+
 
 void unit_test_slater_determinants(){
-  {
+  { // easy test
     Single_Particle_Basis* spb = new Single_Particle_Basis();
     spb->set_num_shells(2);
     spb->set_dimension(4);
@@ -118,7 +126,37 @@ void unit_test_slater_determinants(){
     Many_Particle_Basis *mpb = new Many_Particle_Basis(spb,2);
     printf("Lists all possible slater determinants for a 4 sp state 2 particle system\n");
     mpb->list_states();
+
+    // comparing to what I expect
+    slatdet expected[6] = {0x0000000000000003, // 0011
+			   0x0000000000000005, // 0101
+			   0x0000000000000009, // 1001
+			   0x0000000000000006, // 0110
+			   0x000000000000000a, // 1010
+			   0x000000000000000c};
+    if (mpb->get_dimension() != 6){
+      fprintf(stderr,"slater determinant unit test 1 faild,\n"
+	      "wrong dimension %ld, should be 6\n", mpb->get_dimension());
+      exit(1);
+    }
+
+    for (int i = 0; i<6; i++){
+      if (mpb->get_state(i) != expected[i]){
+	fprintf(stderr,"slater determinant unit test 1 faild,\n"
+		"state %d is %0.64lx,\n"
+		"but should be %0.64lx\n",i, mpb->get_state(i),expected[i]);
+	exit(1);
+      }
+    }
+    printf("slater determinant unit test 1 succeded\n");
+
+    
     delete mpb;
     delete spb;
+  }
+  { // Hard test
+
+
+
   }
 }
