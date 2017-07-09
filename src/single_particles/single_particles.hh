@@ -20,6 +20,7 @@ private:
   int current_state;
 public:
   Single_Particle_Basis();
+  ~Single_Particle_Basis();
   /* The following functions are intended to be used while setting up
    * a single particle basis
    */

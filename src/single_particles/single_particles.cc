@@ -13,6 +13,12 @@ Single_Particle_Basis::Single_Particle_Basis(){
   this->current_state = 0;
 }
 
+Single_Particle_Basis::~Single_Particle_Basis(){
+  if (this->shells != NULL)
+    delete[] this->shells;
+  if (this->states != NULL)
+    delete[] this->states;
+}
 
 void Single_Particle_Basis::set_num_shells(int num_shells){
   if (this->shells != NULL){

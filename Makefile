@@ -3,7 +3,7 @@ CC=g++ --std=c++14
 LFLAGS=
 CFLAGS=
 
-SOURCES= src/program/thundershell.cc src/shell_reader/shell_reader.cc src/single_particles/single_particles.cc
+SOURCES= src/program/thundershell.cc src/shell_reader/shell_reader.cc src/single_particles/single_particles.cc src/slater_determinants/slater_determinants.cc src/utils/maths.cc 
 OBJECTS=$(SOURCES:.cc=.o)
 EXECUTABLE=thundershell
 
