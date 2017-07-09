@@ -19,7 +19,7 @@ private:
   int dimension;
   int current_state;
 public:
-  Single_Particles_Basis();
+  Single_Particle_Basis();
   /* The following functions are intended to be used while setting up
    * a single particle basis
    */
@@ -27,6 +27,11 @@ public:
   void set_dimension(int dimension);
   void add_shell(shell s);
   void add_sp_state(sp_state s);
+  /* The following functions are intended to be used when ever some
+   * info about the single particle basis is needed
+   */
+  int get_dimension();
+  int get_num_shells();
   shell get_shell(int i);
   sp_state get_sp_state(int i);
 };

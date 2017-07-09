@@ -5,6 +5,7 @@
 
 
 Shell_Reader::Shell_Reader(string filename){
+  this->sp_basis = new Single_Particle_Basis();
   FILE* infile = fopen(filename.c_str(),"r");
   if (infile == NULL){
     fprintf(stderr,"Could not open file %s\n",filename.c_str());
@@ -15,6 +16,8 @@ Shell_Reader::Shell_Reader(string filename){
   this->a = -1;
   this->z = -1;
   this->num_shells=-1;
+  this->current_shell = 0;
+  this->parse_mode = false;
   char* current_row = NULL; // a good initial value for getline
   size_t n = 0;
   
@@ -60,10 +63,32 @@ bool Shell_Reader::parse_row(char* row){
     sscanf(row,"%d %d",&a,&z);
   else if (num_shells<0){
     sscanf(row,"%d",&num_shells);
-
+    sp_basis->set_num_shells(num_shells);
+  }else if (!this->parse_mode){
+    this->parse_mode = true;
+  }else if (this->current_shell<sp_basis->get_num_shells()){
+    shell s;
+    sscanf(row,"%*d %d %d %d",
+	   &s.n,&s.l,&s.j);
+    
+    sp_basis->add_shell(s);
+    int dim = sp_basis->get_dimension();
+    dim+=s.j+1;
+    sp_basis->set_dimension(dim);
+    sp_state sps;
+    sps.s = current_shell++;
+    for (sps.m = -s.j; sps.m<=s.j; sps.m+=2){
+      sp_basis->add_sp_state(sps);
+    }
+  }else{
+    return false;
   }
 
   return true;
+}
+
+Single_Particle_Basis* Shell_Reader::get_basis(){
+  return sp_basis;
 }
 
 
@@ -72,5 +97,16 @@ void unit_tests_shell_reader(){
   string sd_shells_filename = "/home/djarv/Dokument/ECTstar_Courses/Course_5/Programs/nushellx/sps/sd.sp";
   Shell_Reader* shell_reader = new Shell_Reader(sd_shells_filename);
 
+  Single_Particle_Basis* sp_basis = shell_reader->get_basis();
+  printf("Printing all the single particle states that should have been produced\n");
+  int i;
+  for (i = 0; i<sp_basis->get_dimension(); i++){
+    sp_state sps = sp_basis->get_sp_state(i);
+    shell sh = sp_basis->get_shell(sps.s);
+    printf("(%d): %d %d %d %d\n",
+	   i,sh.n,sh.l,
+	   sh.j,sps.m);
+  }
+  
   delete shell_reader;
 }

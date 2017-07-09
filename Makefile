@@ -3,7 +3,7 @@ CC=g++ --std=c++14
 LFLAGS=
 CFLAGS=
 
-SOURCES= src/program/thundershell.cc src/shell_reader/shell_reader.cc
+SOURCES= src/program/thundershell.cc src/shell_reader/shell_reader.cc src/single_particles/single_particles.cc
 OBJECTS=$(SOURCES:.cc=.o)
 EXECUTABLE=thundershell
 
@@ -15,7 +15,8 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(EXECUTABLE)
 
-debug: CFLAGS += -DDEBUG
+debug: CFLAGS += -DDEBUG -ggdb
+debug: LFlags += -ggdb
 debug: clean release
 
 .cc.o:
