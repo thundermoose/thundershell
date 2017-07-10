@@ -5,4 +5,6 @@
 size_t noverk(size_t n,size_t k);
 
 
+void unit_tests_maths();
+
 #endif

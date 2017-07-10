@@ -2,6 +2,7 @@
 #include <cstdio>
 #include "../shell_reader/shell_reader.hh"
 #include "../slater_determinants/slater_determinants.hh"
+#include "../utils/maths.hh"
 using namespace std;
 
 void usage(char* prg){
@@ -11,6 +12,7 @@ void usage(char* prg){
 int main(int argc, char** argv){
 #ifdef DEBUG
   printf("This is a unit test\n");
+  unit_tests_maths();
   unit_tests_shell_reader();
   unit_test_slater_determinants();
 #endif

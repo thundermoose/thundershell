@@ -94,7 +94,7 @@ Single_Particle_Basis* Shell_Reader::get_basis(){
 
 
 void unit_tests_shell_reader(){
-  string sd_shells_filename = "/home/djarv/Dokument/ECTstar_Courses/Course_5/Programs/nushellx/sps/sd.sp";
+  string sd_shells_filename = "data/sd.sp";
   Shell_Reader* shell_reader = new Shell_Reader(sd_shells_filename);
 
   Single_Particle_Basis* sp_basis = shell_reader->get_basis();

@@ -20,9 +20,12 @@ private:
   int A;
   void create_particles(slatdet s, int p, int F);
   void annihilate_particles(slatdet s, int h,int p, int F);
+  int get_M(slatdet s);
 public:
   Many_Particle_Basis(Single_Particle_Basis* sp_basis,int A);
+  Many_Particle_Basis(Single_Particle_Basis* sp_basis,int A,int M);
   ~Many_Particle_Basis();
+  void keep_pair_excitations_only();
   void list_states();
   size_t get_dimension();
   slatdet get_state(size_t i);

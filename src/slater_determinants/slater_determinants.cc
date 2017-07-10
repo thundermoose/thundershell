@@ -2,6 +2,7 @@
 #include "../utils/maths.hh"
 #include "../debug/debug.h"
 #include "slater_determinants.hh"
+#include <string.h>
 
 
 slatdet ground(int A){
@@ -58,6 +59,7 @@ Many_Particle_Basis::Many_Particle_Basis(Single_Particle_Basis* sp_basis,
   this->A = A;
   this->current_state = 1;
   dimension = noverk(sp_basis->get_dimension(),A);
+  DEBUG_MSG("dim: %ld, (%d %d)\n",dimension,sp_basis->get_dimension(),A);
   states = new slatdet[dimension];
   states[0]= ground(A);
   DEBUG_MSG("ground: %0.64lx\n",states[0]);
@@ -68,10 +70,62 @@ Many_Particle_Basis::Many_Particle_Basis(Single_Particle_Basis* sp_basis,
   }
   DEBUG_MSG("dimension: %ld, current_state: %ld\n",dimension,current_state);
 }
+
+int Many_Particle_Basis::get_M(slatdet s){
+  int M = 0;
+  for (int i = 0; i<sp_basis->get_dimension(); i++){
+    if (s&1){
+      M+=sp_basis->get_sp_state(i).m;
+    }
+    s>>=1;
+  }
+  return M;
+}
+
+Many_Particle_Basis::Many_Particle_Basis(Single_Particle_Basis* sp_basis,
+					 int A,int M) :
+  Many_Particle_Basis(sp_basis,A){
+  slatdet* wanted_states = new slatdet[dimension];
+  size_t wanted_dimension = 0;
+  for (size_t i = 0; i<dimension; i++){
+    if (get_M(states[i])==M){
+      wanted_states[wanted_dimension++]=states[i];
+    }
+  }
+
+  delete[] states;
+  states = new slatdet[wanted_dimension];
+  memcpy(states,wanted_states,sizeof(slatdet)*wanted_dimension);
+  delete[] wanted_states;
+  dimension = wanted_dimension;
+}
+
 Many_Particle_Basis::~Many_Particle_Basis(){
   delete[] states;
 }
 
+
+inline
+bool is_pair_exciation(slatdet s){
+  slatdet mask = 0xAAAAAAAAAAAAAAAA;
+  return (((s&mask)>>1)^(s&(mask>>1))) == 0;
+}
+
+void Many_Particle_Basis::keep_pair_excitations_only(){
+  slatdet* wanted_states = new slatdet[dimension];
+  size_t wanted_dimension = 0;
+  for (size_t i = 0; i<dimension; i++){
+    if (is_pair_exciation(states[i])){
+      wanted_states[wanted_dimension++]=states[i];
+    }
+  }
+
+  delete[] states;
+  states = new slatdet[wanted_dimension];
+  memcpy(states,wanted_states,sizeof(slatdet)*wanted_dimension);
+  delete[] wanted_states;
+  dimension = wanted_dimension;
+}
 
 void Many_Particle_Basis::list_states(){
   for (size_t i = 0; i<this->dimension; i++){
@@ -155,8 +209,32 @@ void unit_test_slater_determinants(){
     delete spb;
   }
   { // Hard test
-
-
-
+    Single_Particle_Basis* spb = new Single_Particle_Basis();
+    spb->set_num_shells(4);
+    spb->set_dimension(8);
+    shell sh;
+    sh.l = 0;
+    sh.j = 1;
+    sp_state st;
+    printf("Setting up pair shells and states\n");
+    for (int p = 0; p<4; p++){
+      sh.n = p+1;
+      spb->add_shell(sh);
+      st.s = p;
+      st.m = -1;
+      spb->add_sp_state(st);
+      st.m = 1;
+      spb->add_sp_state(st);
+    }
+    Many_Particle_Basis *mpb_all = new Many_Particle_Basis(spb,4);
+    Many_Particle_Basis *mpb_pairs = new Many_Particle_Basis(spb,4,0);
+    mpb_pairs->keep_pair_excitations_only();
+    printf("all 4 particle slater determinants in 4st s shells\n");
+    mpb_all->list_states();
+    printf("pair excitations only\n");
+    mpb_pairs->list_states();
+    delete spb;
+    delete mpb_all;
+    delete mpb_pairs;
   }
 }
