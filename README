@@ -1,0 +1,12 @@
+This is the thundershell shell model code. It is currently under construction
+so do not expect wonders from it yet.
+
+For the moment there are only unit tests that can be runed.
+
+usage ordinary mood:
+make
+./thundershell
+
+usage debug mood:
+make debug
+./thundershell
