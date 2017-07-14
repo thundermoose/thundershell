@@ -13,6 +13,20 @@ slatdet ground(int A){
   }
   return a;
 }
+#define HASHCONST 0x0123456789ABCDEF
+uint64_t hash_func(slatdet s){
+  return s^(s<<16)^(s<<32)^HASHCONST;
+}
+
+void Many_Particle_Basis::add_to_hash(slatdet s, size_t i){
+  uint64_t hash = hash_func(s);
+  while (hash_array[hash%this->hash_size].i>-1){
+    hash++;
+    DEBUG_MSG("hash = 0x%lx\n",hash);
+  }
+  hash_array[hash%this->hash_size].key = s;
+  hash_array[hash%this->hash_size].i = i;
+}
 
 void Many_Particle_Basis::create_particles(slatdet s,int p,int F){
   if (p == 0){
@@ -58,7 +72,7 @@ Many_Particle_Basis::Many_Particle_Basis(Single_Particle_Basis* sp_basis,
   this->sp_basis = sp_basis;
   this->A = A;
   this->current_state = 1;
-  dimension = noverk(sp_basis->get_dimension(),A);
+  this->dimension = noverk(sp_basis->get_dimension(),A);
   DEBUG_MSG("dim: %ld, (%d %d)\n",dimension,sp_basis->get_dimension(),A);
   states = new slatdet[dimension];
   states[0]= ground(A);
@@ -69,6 +83,19 @@ Many_Particle_Basis::Many_Particle_Basis(Single_Particle_Basis* sp_basis,
     annihilate_particles(next_state,phex,phex,A); 
   }
   DEBUG_MSG("dimension: %ld, current_state: %ld\n",dimension,current_state);
+}
+
+void Many_Particle_Basis::set_up_hash(){
+  this->hash_size = this->dimension*2;
+  this->hash_array = new hash_element[this->hash_size];
+  for (size_t i=0; i<this->hash_size; i++){
+    this->hash_array[i].i = -1;
+    this->hash_array[i].key = 0;
+  }
+  for (size_t i = 0; i<dimension; i++){
+    add_to_hash(states[i],i);
+  }
+  
 }
 
 int Many_Particle_Basis::get_M(slatdet s){
@@ -144,10 +171,22 @@ size_t Many_Particle_Basis::get_dimension(){
   return this->dimension;
 }
 
+size_t Many_Particle_Basis::get_sp_dimension(){
+  return this->sp_basis->get_dimension();
+}
+
 slatdet Many_Particle_Basis::get_state(size_t i){
   return states[i];
 }
 
+ssize_t Many_Particle_Basis::get_index(slatdet s){
+  uint64_t hash = hash_func(s);
+  while (this->hash_array[hash%this->hash_size].key != s &&
+	 this->hash_array[hash%this->hash_size].i != -1){
+    hash++;
+  }
+  return this->hash_array[hash%this->hash_size].i;
+}
 
 void unit_test_slater_determinants(){
   { // easy test
